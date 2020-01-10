@@ -1,13 +1,12 @@
 import React from 'react'
 
 function Search ({ 
-  absInputChange, 
-  absPaste, 
-  absClickFunction, 
+  absInputChange,
   value, 
-  abcQueryParamChange,
+  absQueryParamChange,
   queryParamType 
 }) {
+
   return (
   <div className="flex-center bottom-padding">
     <input
@@ -16,9 +15,8 @@ function Search ({
       onChange={absInputChange}
       value={value}
       />
-    <button  onClick={absClickFunction}>Search</button>
     
-    <select className='bg-light searchCriterion' value={queryParamType} onChange={abcQueryParamChange}>
+    <select className='bg-light searchCriterion' value={queryParamType} onChange={absQueryParamChange}>
       <option value="">
         Select Search Criterion
       </option>
@@ -33,9 +31,6 @@ function Search ({
       </option>
       <option value="rating">
         Rating
-      </option>
-      <option value="reset">
-        Reset
       </option>
     </select>
   </div>

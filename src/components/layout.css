@@ -954,3 +954,11 @@ li {
 .searchCriterion {
   margin-left: 10px;
 }
+
+.resetButton {
+  width: 480px;
+}
+
+.top-padding {
+  margin-top: 5px;
+}

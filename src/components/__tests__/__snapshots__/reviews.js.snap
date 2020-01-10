@@ -18,11 +18,6 @@ exports[`Reviews renders correctly 1`] = `
       type="text"
       value=""
     />
-    <button
-      onClick={[Function]}
-    >
-      Search
-    </button>
     <select
       className="bg-light searchCriterion"
       onChange={[Function]}
@@ -53,12 +48,28 @@ exports[`Reviews renders correctly 1`] = `
       >
         Rating
       </option>
-      <option
-        value="reset"
-      >
-        Reset
-      </option>
     </select>
+  </div>
+  <div
+    className="flex-center"
+  >
+    <button
+      className="bg-light resetButton searchCriterion"
+      onClick={[Function]}
+      type="submit"
+    >
+      Search
+    </button>
+  </div>
+  <div
+    className="top-padding flex-center"
+  >
+    <button
+      className="bg-light resetButton searchCriterion"
+      onClick={[Function]}
+    >
+      Reset
+    </button>
   </div>
   <ul
     className="grid space-around"

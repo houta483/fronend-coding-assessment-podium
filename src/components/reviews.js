@@ -44,10 +44,15 @@ class Reviews extends React.Component {
   }
 
   inputID () {
-
     this.setState({
       appliedQuery: this.state.queryString
     });
+    
+    if (this.state.appliedQuery === "" || this.state.queryParamType === "") {
+      return (
+        alert("Please select a criterion and enter a value")
+      )
+    }
   }
 
   async componentDidMount() {
@@ -185,25 +190,6 @@ class Reviews extends React.Component {
       )
     }
 
-    if (this.state.queryParamType === 'reset') {
-      // rerender all cards
-      console.log("this is the rating" + this.state.rating)
-      return (
-        <li key={index}>
-          <Card
-            rating={`Rating: ${el}`}
-            publish_time={this.state.publish_time[index]}
-            publish_date={this.state.publish_date[index]}
-            ID={`ID: ${this.state.id[index]}`}
-            body={this.state.body[index]}
-            author={`Author: ${this.state.author[index]}`}
-          >
-          </Card>
-        </li>
-      )
-    }
-    
-
     if (this.state.queryParamType === '' || this.state.appliedQuery === '') {
       return (
         <li key={index}>
@@ -231,11 +217,30 @@ class Reviews extends React.Component {
         </div>
         <Search 
           absInputChange={this.handleInputChange} 
-          absClickFunction={this.inputID}
           value={this.state.queryString}
-          abcQueryParamChange={this.handleQueryParamChange}
+          absQueryParamChange={this.handleQueryParamChange}
           queryParamType={this.state.queryParamType}
         />
+      <div className="flex-center">
+        <button 
+          onClick={this.inputID}
+          className="bg-light resetButton searchCriterion"
+          type="submit"
+        >Search
+        </button>
+      </div>
+      <div className="top-padding flex-center">
+      <button 
+        className="bg-light resetButton searchCriterion"
+        onClick={() => this.setState({
+          queryParamType: ",",
+          appliedQuery: "",
+          queryString: ""
+        })}
+      > 
+        Reset 
+      </button>
+      </div>
 
       <ul className='grid space-around'>
         {this.state.rating.map((el, index) => this.filter(index, el))}
