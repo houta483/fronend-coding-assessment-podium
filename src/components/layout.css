@@ -646,6 +646,10 @@ li {
   list-style-type: none;
 }
 
+.red-text {
+  color: red;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -658,12 +662,22 @@ li {
   align-items: center;
 }
 
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: black;
+  font-size: small;
+}
+
+.bottom-padding {
+  padding-bottom: 10px;
+}
+
 .border {
   border-style: groove;
   border-color: #d1c1e0;
   position: -webkit-sticky;
+  z-index: 99;
   position: sticky;
-  height: auto;
+  height: 80px;
   top: 0;
   background-color: whitesmoke;
   width: 100%;

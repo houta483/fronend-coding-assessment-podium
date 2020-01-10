@@ -27,6 +27,8 @@ function getDifference(oldval, newval)
     return result;
 }
 
+let cache = {};
+
 class Reviews extends React.Component {
   constructor(props) {
     super(props);
@@ -39,7 +41,10 @@ class Reviews extends React.Component {
       body: [],
       author: [],
       pasting: false,
-      id: ""
+      queryId: "",
+      errorMessage: "",
+      singleValue: false,
+      runSingleOutput: false,
     }
     this.cleanDate = this.cleanDate.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
@@ -59,41 +64,54 @@ class Reviews extends React.Component {
       this.setState({pasting: false});
     }
     else {
+      console.log(this.state.queryId)
       const target = e.target
       const value = target.value
       this.setState({
-        id: value,
+        queryId: value,
       })
     }
   }
 
-  inputID () {
-     fetch(`https://shakespeare.podium.com/api/reviews/${this.state.id}`, {
-     method: 'GET',
-     headers: {
-       "x-api-key": "H3TM28wjL8R4#HTnqk?c"
-     }
-   })
-     .then((response) => {
-       return response.json();
-     })
-     .then((data) => {
-      data.forEach(el => {
-        this.setState({
-          rating: [...this.state.rating, el.rating],
-          publish_time: [...this.state.publish_time, this.cleanDate(el.publish_date, "time")],
-          publish_date: [...this.state.publish_date, this.cleanDate(el.publish_date, "date")],
-          id: [...this.state.id, el.id],
-          body: [...this.state.body, el.body],
-          author: [...this.state.author, el.author],
-        })
-      })
+  async inputID () {
+    let stringId = String(this.state.queryId)
+
+    if (this.state.id.indexOf(stringId) !== -1 && this.state.queryId !== "") {
+      this.setState({ errorMessage: "", singleValue: true })
+      await fetch(`https://shakespeare.podium.com/api/reviews/${this.state.queryId}`, {
+      method: 'GET',
+      headers: {
+        "x-api-key": "H3TM28wjL8R4#HTnqk?c"
+      }
     })
-    console.log(this.state.id)
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        return (
+          this.setState({
+            rating: [data.rating],
+            publish_time: [this.cleanDate(data.publish_date, "time")],
+            publish_date: [this.cleanDate(data.publish_date, "date")],
+            id: [data.id],
+            body: [data.body],
+            author: [data.author],
+          })
+        )
+     })
+    }
+    else if (this.state.queryId === "") {
+      return cache
+    }
+    else {
+      return (
+        this.setState({ errorMessage: "Please enter a valid ID number."})
+      )
+    }
   }
 
-  componentDidMount() {
-    fetch('https://shakespeare.podium.com/api/reviews', {
+  async componentDidMount() {
+    await fetch('https://shakespeare.podium.com/api/reviews', {
     method: 'GET',
     headers: {
       "x-api-key": "H3TM28wjL8R4#HTnqk?c"
@@ -114,13 +132,15 @@ class Reviews extends React.Component {
         })
       })
     })
+    cache = Object.assign({}, this.state)
+    console.log(cache)
   }
 
   cleanDate(dateTime, differentiator) {
     let uncleanDate = dateTime.slice(0,10);
     let uncleanTime = dateTime.slice(11,19);
 
-    let time = uncleanTime.split(':'); // convert to array
+    let time = uncleanTime.split(':');
 
     let hours = Number(time[0]);
     let minutes = Number(time[1]);
@@ -150,32 +170,75 @@ class Reviews extends React.Component {
   }
   
   render () {
-    return (
-      <div>
-        <input 
-          type="text" 
-          onChange={this.handleInputChange}
-          />
-        <button onPaste={this.paste} onClick={() => {this.inputID()}}>Submit</button>
-      <ul className='grid space-around'>
-        {this.state.rating.map((el, index) => {
-          return (
-            <li key={index}>
-              <Card
-                rating={`Rating: ${el}`}
-                publish_time={this.state.publish_time[index]}
-                publish_date={this.state.publish_date[index]}
-                ID={`ID: ${this.state.id[index]}`}
-                body={this.state.body[index]}
-                author={`Author: ${this.state.author[index]}`}
-              >
-              </Card>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-    )
+    if (Object.values(cache).length <= 0 ||  this.state.singleValue === true) {
+      return (
+        <div>
+          <div className="flex-center red-text">
+            {this.state.errorMessage}
+          </div>
+          <div className="flex-center bottom-padding">
+            <input
+              type="text"
+              placeholder="Please enter a valid ID number" 
+              onChange={this.handleInputChange}
+              />
+            <button onPaste={this.paste} onClick={() => {this.inputID()}}>Search</button>
+          </div>
+        <ul className='grid space-around'>
+          {this.state.rating.map((el, index) => {
+            return (
+              <li key={index}>
+                <Card
+                  rating={`Rating: ${el}`}
+                  publish_time={this.state.publish_time[index]}
+                  publish_date={this.state.publish_date[index]}
+                  ID={`ID: ${this.state.id[index]}`}
+                  body={this.state.body[index]}
+                  author={`Author: ${this.state.author[index]}`}
+                >
+                </Card>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      )
+    }
+    // when reverting back to original
+    else {
+      return (
+        <div>
+        <div className="flex-center red-text">
+            {this.state.errorMessage}
+          </div>
+          <div className="flex-center bottom-padding">
+            <input
+              type="text"
+              placeholder="Please enter a valid ID number" 
+              onChange={this.handleInputChange}
+              />
+            <button onPaste={this.paste} onClick={() => {this.inputID()}}>Search</button>
+          </div>
+        <ul className='grid space-around'>
+          {cache.rating.map((el, index) => {
+            return (
+              <li key={index}>
+                <Card
+                  rating={`Rating: ${el}`}
+                  publish_time={cache.publish_time[index]}
+                  publish_date={cache.publish_date[index]}
+                  ID={`ID: ${cache.id[index]}`}
+                  body={cache.body[index]}
+                  author={`Author: ${cache.author[index]}`}
+                >
+                </Card>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+      )
+    }
   }
 }
 
