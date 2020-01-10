@@ -14,15 +14,51 @@ exports[`Reviews renders correctly 1`] = `
   >
     <input
       onChange={[Function]}
-      placeholder="Please enter a valid ID number"
+      placeholder="Please enter a search term"
       type="text"
+      value=""
     />
     <button
       onClick={[Function]}
-      onPaste={[Function]}
     >
       Search
     </button>
+    <select
+      className="bg-light searchCriterion"
+      onChange={[Function]}
+      value=""
+    >
+      <option
+        value=""
+      >
+        Select Search Criterion
+      </option>
+      <option
+        value="id"
+      >
+        ID
+      </option>
+      <option
+        value="body"
+      >
+        Body
+      </option>
+      <option
+        value="author"
+      >
+        Author
+      </option>
+      <option
+        value="rating"
+      >
+        Rating
+      </option>
+      <option
+        value="reset"
+      >
+        Reset
+      </option>
+    </select>
   </div>
   <ul
     className="grid space-around"

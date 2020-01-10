@@ -1,32 +1,9 @@
 import React from 'react';
 import fetch from "node-fetch";
 
+import Search from './search'
 import Card from './card'
 import './layout.css';
-
-function getDifference(oldval, newval)
-{
-    let j = 0;
-    let result = "";
-
-    while (j < newval.length)
-    {
-        if (typeof (oldval[j]) === "undefined"){
-           if (oldval[j-result.length] !== newval[j]){
-              result += newval[j];
-           }  
-        }else{
-           if (oldval[j] !== newval[j]){
-              result += newval[j];
-           }  
-        }
-            
-        j++;
-    }
-    return result;
-}
-
-let cache = {};
 
 class Reviews extends React.Component {
   constructor(props) {
@@ -39,74 +16,38 @@ class Reviews extends React.Component {
       id: [],
       body: [],
       author: [],
-      pasting: false,
       queryId: "",
       errorMessage: "",
       singleValue: false,
       runSingleOutput: false,
+      queryParamType: '',
+      queryString: '',
+      appliedQuery: '',
     }
     this.cleanDate = this.cleanDate.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.paste = this.paste.bind(this);
+    this.inputID = this.inputID.bind(this);
+    this.handleQueryParamChange = this.handleQueryParamChange.bind(this);
+    this.filter = this.filter.bind(this);
   }
 
-  paste(e) {
-    this.setState({ pasting: true, id: e.target.value})
+  handleQueryParamChange(e) {
+    this.setState({
+      queryParamType: e.target.value
+    });
   }
   
   handleInputChange(e) {
-    if(this.state.pasting){
-      let oldval = this.state.id;
-      let newval = e.target.value;
-      let pastedValue = getDifference(oldval, newval);
-      console.log(pastedValue);
-      this.setState({pasting: false});
-    }
-    else {
-      console.log(this.state.queryId)
-      const target = e.target
-      const value = target.value
-      this.setState({
-        queryId: value,
-      })
-    }
+    this.setState({
+      queryString: e.target.value
+    });
   }
 
-  async inputID () {
-    let stringId = String(this.state.queryId)
+  inputID () {
 
-    if (this.state.id.indexOf(stringId) !== -1 && this.state.queryId !== "") {
-      this.setState({ errorMessage: "", singleValue: true })
-      await fetch(`https://shakespeare.podium.com/api/reviews/${this.state.queryId}`, {
-      method: 'GET',
-      headers: {
-        "x-api-key": "H3TM28wjL8R4#HTnqk?c"
-      }
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        return (
-          this.setState({
-            rating: [data.rating],
-            publish_time: [this.cleanDate(data.publish_date, "time")],
-            publish_date: [this.cleanDate(data.publish_date, "date")],
-            id: [data.id],
-            body: [data.body],
-            author: [data.author],
-          })
-        )
-     })
-    }
-    else if (this.state.queryId === "") {
-      return cache
-    }
-    else {
-      return (
-        this.setState({ errorMessage: "Please enter a valid ID number."})
-      )
-    }
+    this.setState({
+      appliedQuery: this.state.queryString
+    });
   }
 
   async componentDidMount() {
@@ -131,8 +72,6 @@ class Reviews extends React.Component {
         })
       })
     })
-    cache = Object.assign({}, this.state)
-    console.log(cache)
   }
 
   cleanDate(dateTime, differentiator) {
@@ -167,77 +106,142 @@ class Reviews extends React.Component {
 
     return returnValue
   }
+
+  filter(index, el) {
+
+    if (
+      this.state.queryParamType === 'body' && 
+      this.state.body[index].includes(this.state.appliedQuery)
+      ) {
+        return (
+          <li key={index}>
+            <Card
+              rating={`Rating: ${el}`}
+              publish_time={this.state.publish_time[index]}
+              publish_date={this.state.publish_date[index]}
+              ID={`ID: ${this.state.id[index]}`}
+              body={this.state.body[index]}
+              author={`Author: ${this.state.author[index]}`}
+            >
+            </Card>
+          </li>
+        )
+    } 
+
+    if (
+      this.state.queryParamType === 'id' && 
+      this.state.id[index] === this.state.appliedQuery
+    ) {
+      return (
+        <li key={index}>
+          <Card
+            rating={`Rating: ${el}`}
+            publish_time={this.state.publish_time[index]}
+            publish_date={this.state.publish_date[index]}
+            ID={`ID: ${this.state.id[index]}`}
+            body={this.state.body[index]}
+            author={`Author: ${this.state.author[index]}`}
+          >
+          </Card>
+        </li>
+      )
+    }
+
+    if (
+      this.state.queryParamType === 'author' &&
+      this.state.author[index].includes(this.state.appliedQuery)
+    ) {
+      return (
+        <li key={index}>
+          <Card
+            rating={`Rating: ${el}`}
+            publish_time={this.state.publish_time[index]}
+            publish_date={this.state.publish_date[index]}
+            ID={`ID: ${this.state.id[index]}`}
+            body={this.state.body[index]}
+            author={`Author: ${this.state.author[index]}`}
+          >
+          </Card>
+        </li>
+      )
+    }
+
+    if (
+      this.state.queryParamType === 'rating' &&
+      this.state.appliedQuery == el
+    ) {
+      return (
+        <li key={index}>
+          <Card
+            rating={`Rating: ${el}`}
+            publish_time={this.state.publish_time[index]}
+            publish_date={this.state.publish_date[index]}
+            ID={`ID: ${this.state.id[index]}`}
+            body={this.state.body[index]}
+            author={`Author: ${this.state.author[index]}`}
+          >
+          </Card>
+        </li>
+      )
+    }
+
+    if (this.state.queryParamType === 'reset') {
+      // rerender all cards
+      console.log("this is the rating" + this.state.rating)
+      return (
+        <li key={index}>
+          <Card
+            rating={`Rating: ${el}`}
+            publish_time={this.state.publish_time[index]}
+            publish_date={this.state.publish_date[index]}
+            ID={`ID: ${this.state.id[index]}`}
+            body={this.state.body[index]}
+            author={`Author: ${this.state.author[index]}`}
+          >
+          </Card>
+        </li>
+      )
+    }
+    
+
+    if (this.state.queryParamType === '' || this.state.appliedQuery === '') {
+      return (
+        <li key={index}>
+          <Card
+            rating={`Rating: ${el}`}
+            publish_time={this.state.publish_time[index]}
+            publish_date={this.state.publish_date[index]}
+            ID={`ID: ${this.state.id[index]}`}
+            body={this.state.body[index]}
+            author={`Author: ${this.state.author[index]}`}
+          >
+          </Card>
+        </li>
+      )
+    }
+
+    return null;
+  }
   
   render () {
-    if (Object.values(cache).length <= 0 ||  this.state.singleValue === true) {
-      return (
-        <div data-testid="parentDiv">
-          <div className="flex-center red-text">
-            {this.state.errorMessage}
-          </div>
-          <div className="flex-center bottom-padding">
-            <input
-              type="text"
-              placeholder="Please enter a valid ID number" 
-              onChange={this.handleInputChange}
-              />
-            <button onPaste={this.paste} onClick={() => {this.inputID()}}>Search</button>
-          </div>
-        <ul className='grid space-around'>
-          {this.state.rating.map((el, index) => {
-            return (
-              <li key={index}>
-                <Card
-                  rating={`Rating: ${el}`}
-                  publish_time={this.state.publish_time[index]}
-                  publish_date={this.state.publish_date[index]}
-                  ID={`ID: ${this.state.id[index]}`}
-                  body={this.state.body[index]}
-                  author={`Author: ${this.state.author[index]}`}
-                >
-                </Card>
-              </li>
-            )
-          })}
-        </ul>
-      </div>
-      )
-    }
-    // when reverting back to original
-    else {
-      return (
-        <div>
+    return (
+      <div data-testid="parentDiv">
         <div className="flex-center red-text">
-            {this.state.errorMessage}
-          </div>
-          <div className="flex-center bottom-padding">
-            <input
-              type="text"
-              placeholder="Please enter a valid ID number" 
-              onChange={this.handleInputChange}
-              />
-            <button onPaste={this.paste} onClick={() => {this.inputID()}}>Search</button>
-          </div>
-        <ul className='grid space-around'>
-          {cache.rating.map((el, index) => {
-            return (
-              <li key={index}>
-                <Card
-                  rating={`Rating: ${el}`}
-                  publish_time={cache.publish_time[index]}
-                  publish_date={cache.publish_date[index]}
-                  ID={`ID: ${cache.id[index]}`}
-                  body={cache.body[index]}
-                  author={`Author: ${cache.author[index]}`}
-                >
-                </Card>
-              </li>
-            )
-          })}
-        </ul>
-      </div>
-      )
-    }
+          {this.state.errorMessage}
+        </div>
+        <Search 
+          absInputChange={this.handleInputChange} 
+          absClickFunction={this.inputID}
+          value={this.state.queryString}
+          abcQueryParamChange={this.handleQueryParamChange}
+          queryParamType={this.state.queryParamType}
+        />
+
+      <ul className='grid space-around'>
+        {this.state.rating.map((el, index) => this.filter(index, el))}
+      </ul>
+    </div>
+    )
   }
 }
 
