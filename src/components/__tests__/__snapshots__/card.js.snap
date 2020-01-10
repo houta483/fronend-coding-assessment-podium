@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Card renders correctly 1`] = `
+<div
+  className="card bg-light"
+>
+  <div
+    className="top-contents"
+  >
+    <div
+      className="small"
+    >
+       
+       
+    </div>
+    <div
+      className="small"
+    >
+       
+       
+    </div>
+    <div
+      className="small"
+    >
+       
+       
+    </div>
+  </div>
+  <h4
+    className="header-lg center-text"
+  >
+    "
+    "
+  </h4>
+  <div
+    className="center-text"
+  >
+    <div />
+    <div />
+  </div>
+</div>
+`;

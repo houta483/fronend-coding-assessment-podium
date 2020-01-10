@@ -1,0 +1,31 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Reviews renders correctly 1`] = `
+<div
+  data-testid="parentDiv"
+>
+  <div
+    className="flex-center red-text"
+  >
+    
+  </div>
+  <div
+    className="flex-center bottom-padding"
+  >
+    <input
+      onChange={[Function]}
+      placeholder="Please enter a valid ID number"
+      type="text"
+    />
+    <button
+      onClick={[Function]}
+      onPaste={[Function]}
+    >
+      Search
+    </button>
+  </div>
+  <ul
+    className="grid space-around"
+  />
+</div>
+`;

@@ -6,18 +6,17 @@ import './layout.css';
 
 function getDifference(oldval, newval)
 {
-    let i = 0;
     let j = 0;
     let result = "";
 
     while (j < newval.length)
     {
         if (typeof (oldval[j]) === "undefined"){
-           if (oldval[j-result.length] != newval[j]){
+           if (oldval[j-result.length] !== newval[j]){
               result += newval[j];
            }  
         }else{
-           if (oldval[j] != newval[j]){
+           if (oldval[j] !== newval[j]){
               result += newval[j];
            }  
         }
@@ -152,7 +151,7 @@ class Reviews extends React.Component {
       timeValue= "" + hours;
     } else if (hours > 12) {
       timeValue= "" + (hours - 12);
-    } else if (hours == 0) {
+    } else if (hours === 0) {
       timeValue= "12";
     }
     
@@ -172,7 +171,7 @@ class Reviews extends React.Component {
   render () {
     if (Object.values(cache).length <= 0 ||  this.state.singleValue === true) {
       return (
-        <div>
+        <div data-testid="parentDiv">
           <div className="flex-center red-text">
             {this.state.errorMessage}
           </div>
